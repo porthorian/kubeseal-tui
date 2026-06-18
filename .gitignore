@@ -24,6 +24,10 @@ profile.cov
 go.work
 go.work.sum
 
+# Local build output
+/kubeseal-tui
+dist/
+
 # env file
 .env
 

@@ -1,0 +1,69 @@
+version: 2
+
+project_name: kubeseal-tui
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: kubeseal-tui
+    main: .
+    binary: kubeseal-tui
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/porthorian/kubeseal-tui/cmd.version={{ .Version }}
+      - -X github.com/porthorian/kubeseal-tui/cmd.commit={{ .Commit }}
+      - -X github.com/porthorian/kubeseal-tui/cmd.date={{ .Date }}
+
+archives:
+  - id: kubeseal-tui
+    ids:
+      - kubeseal-tui
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+homebrew_casks:
+  - name: kubeseal-tui
+    ids:
+      - kubeseal-tui
+    binaries:
+      - kubeseal-tui
+    repository:
+      owner: porthorian
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: "https://github.com/porthorian/kubeseal-tui"
+    description: "Prompt-driven CLI for generating Kubernetes SealedSecret manifests"
+    dependencies:
+      - formula: kubeseal
